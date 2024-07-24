@@ -1,0 +1,62 @@
+- init:
+    run: rm -f hw2
+    blocker: true
+
+- build:
+    run: g++ -Wall -Werror src/main.cpp src/structs.cpp src/huffman.cpp -I include -o main -lm # timeout: 10
+    exit: 0
+    points: 2
+    blocker: true
+
+- case1:
+    run: ./main key3.txt
+    script: 
+        - expect: '.*'
+        - send: "1"
+        - expect: '.*'
+        - send: "2"
+        - expect: '.*'
+        - send: "3"
+        - expect: '.*'
+        - send: "4"
+        - expect: '.*'
+        - send: "LIVE_LONG_AND_PROSPER"
+        - expect: '.*'
+        - send: "5"
+        - expect: 'Encoded Password Binary: 10010000011010101011110010000110011101110111101010100110110111100100111000111010000100100111(.*)Encoded Password Value: 546335456365534446434'
+        - send: "6"
+        - expect: '.*'
+        - send: "10010000011010101011110010000110011101110111101010100110110111100100111000111010000100100111"
+        - expect: ".*"
+        - send: "546335456365534446434"
+        - expect: 'Decoded Password: LIVE_LONG_AND_PROSPER'
+        - send: "7"
+    exit: 0
+    points: 4
+
+- case2:
+    run: valgrind --leak-check=full ./main key3.txt
+    script:
+        - expect: '.*'
+        - send: '1'
+        - expect: '.*'
+        - send: '2'
+        - expect: '.*'
+        - send: '3'
+        - expect: '.*'
+        - send: '4'
+        - expect: '.*'
+        - send: 'LIVE_LONG_AND_PROSPER'
+        - expect: '.*'
+        - send: '5'
+        - expect: 'Encoded Password Binary: 10010000011010101011110010000110011101110111101010100110110111100100111000111010000100100111(.*)Encoded Password Value: 546335456365534446434'
+        - send: '6'
+        - expect: '.*'
+        - send: '10010000011010101011110010000110011101110111101010100110110111100100111000111010000100100111'
+        - expect: '.*'
+        - send: '546335456365534446434'
+        - expect: 'Decoded Password: LIVE_LONG_AND_PROSPER'
+        - send: '7'
+        - expect: '(.*)All heap blocks were freed -- no leaks are possible(.*)'
+    exit: 0
+    points: 3
